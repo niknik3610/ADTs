@@ -6,13 +6,11 @@ struct Graph {
     nodes: HashMap<char, Node>
 }
 
-#[derive(Debug)]
 struct Node {
     name: char,
     connections: Box<Vec<Link>>
 }
 
-#[derive(Debug)]
 struct Link {
     cost: u32,
     destination: char
@@ -49,8 +47,32 @@ impl Graph {
         } 
         return true;
     }
+    pub fn print_graph(&self) {
+        println!("-----------------------------------------------------");
+        for (key, node) in &self.nodes {
+            println!("Node: {key}");
+            println!("Connections:");  
+            for link in node.connections.as_slice() {
+                println!("Name: {} Cost: {}", link.destination, link.cost);
+            } 
+            println!();
+        }
+    }
 }
 
 fn main() {
+    let mut graph = Graph {
+        nodes: HashMap::new()
+    };
+    graph.new_node('A');
+    graph.new_node('B');
+    graph.new_node('C');
+    graph.new_node('D');
+    graph.print_graph();
 
+    graph.new_connection('A', 'B', 5);
+    graph.new_connection('B', 'C', 10);
+    graph.new_connection('C', 'D', 3);
+    graph.new_connection('D', 'A', 4);
+    graph.print_graph();
 }
