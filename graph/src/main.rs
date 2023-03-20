@@ -2,10 +2,8 @@
 #![allow(unused_variables)]
 use std::collections::HashMap;
 
-#[derive(Debug)]
-struct Link {
-    cost: u32,
-    destination: Node
+struct Graph {
+    nodes: HashMap<char, Node>
 }
 
 #[derive(Debug)]
@@ -14,8 +12,10 @@ struct Node {
     connections: Box<Vec<Link>>
 }
 
-struct Graph {
-    nodes: HashMap<char, Node>
+#[derive(Debug)]
+struct Link {
+    cost: u32,
+    destination: char
 }
 
 impl Graph {
@@ -30,6 +30,23 @@ impl Graph {
             connections: Box::new(Vec::new()) 
         };
         self.nodes.insert(name, new_node);
+        return true;
+    }
+    pub fn new_connection(&mut self, node_one_name: char, node_two_name: char, cost: u32) -> bool { 
+        match self.nodes.contains_key(&node_two_name) {
+            true => {}
+            false => return false
+        }
+
+        match self.nodes.get_mut(&node_one_name) {
+            Some(node) => node.connections.push(Link{cost, destination: node_two_name}),
+            None => return false
+        }
+
+        match self.nodes.get_mut(&node_two_name) {
+            Some(node) => node.connections.push(Link{cost, destination: node_one_name}),
+            None => return false
+        } 
         return true;
     }
 }
