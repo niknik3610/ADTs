@@ -31,6 +31,10 @@ impl Graph {
         return true;
     }
     pub fn new_connection(&mut self, node_one_name: char, node_two_name: char, cost: u32) -> bool { 
+        if node_one_name == node_two_name {
+            return false;
+        }
+
         match self.nodes.contains_key(&node_two_name) {
             true => {}
             false => return false
