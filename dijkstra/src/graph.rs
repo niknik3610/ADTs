@@ -8,7 +8,7 @@ pub struct Graph {
 
 pub struct Node {
     name: char,
-    connections: Box<Vec<Link>>
+    pub connections: Box<Vec<Link>>
 }
 
 struct Link {

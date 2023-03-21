@@ -23,12 +23,12 @@ fn shortest_path(graph: &Graph, start_node: char, end_node: char) -> Result<Stri
     for (key, ..) in &graph.nodes {
         if *key == start_node {
             distances.insert(ShortestPathEntry {node: start_node, cost: 0});
-            final_path.insert(*key);
+            spt.insert(*key);
             continue;
         }
         distances.insert(ShortestPathEntry { node: *key, cost: INFINITY });
     }
-    for entry in distances {
+    for entry in distances.iter() {
         println!("Node Name: {}, Node Cost: {}", entry.node, entry.cost);
     }
     
@@ -38,9 +38,20 @@ fn shortest_path(graph: &Graph, start_node: char, end_node: char) -> Result<Stri
     }; 
 
     loop {
-        let smallest_value = temp_path;
-        for entry in distances {
-            
+        let mut smallest_value = &temp_path;
+        for entry in distances.iter() {
+            if entry.cost < smallest_value.cost && !spt.contains(&entry.node.clone()) {
+                smallest_value = &entry;
+            }
+        }
+        
+        if *smallest_value == temp_path  {
+            break;
+        }
+
+        spt.insert(smallest_value.node);
+        for entry in graph.nodes.get(&smallest_value.node).unwrap().connections.into_iter() {
+
         }
     }
 
