@@ -6,7 +6,7 @@ use std::collections::HashSet;
 
 const INFINITY: u32 = 99999;
 
-#[derive(Hash, Eq, PartialEq, Debug)]
+#[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
 struct ShortestPathEntry {
     node: char,
     cost: u32
@@ -16,45 +16,48 @@ fn shortest_path(graph: &Graph, start_node: char, end_node: char) -> Result<Stri
     if !graph.nodes.contains_key(&start_node) || !graph.nodes.contains_key(&end_node) {
         return Err("Graph doesn't contain these nodes".to_string()); 
     }
-    let mut distances = HashSet::new();
-    let mut spt = HashSet::new();
+    let mut not_visited = HashMap::new();
+    let mut visited = HashSet::new();
     let mut final_path: BTreeSet<char> = BTreeSet::new();
 
     for (key, ..) in &graph.nodes {
         if *key == start_node {
-            distances.insert(ShortestPathEntry {node: start_node, cost: 0});
-            spt.insert(*key);
+            not_visited.insert(start_node, 0);
             continue;
         }
-        distances.insert(ShortestPathEntry { node: *key, cost: INFINITY });
-    }
-    for entry in distances.iter() {
-        println!("Node Name: {}, Node Cost: {}", entry.node, entry.cost);
+        not_visited.insert(*key, INFINITY );
     }
     
     let temp_path = ShortestPathEntry {
         node: '$',
-        cost: INFINITY
+        cost: INFINITY + 1
     }; 
 
     loop {
-        let mut smallest_value = &temp_path;
-        for entry in distances.iter() {
-            if entry.cost < smallest_value.cost && !spt.contains(&entry.node.clone()) {
-                smallest_value = &entry;
+        println!("visited: {visited:?}");
+        println!("not visited: {not_visited:?}"); 
+
+        let mut smallest_value = temp_path.clone();
+        for (node, cost) in not_visited.iter() {
+            if cost < &smallest_value.cost {
+                smallest_value = ShortestPathEntry {node: *node, cost: *cost};
             }
-        }
-        
-        if *smallest_value == temp_path  {
+        } 
+        if smallest_value == temp_path  {
             break;
         }
 
-        spt.insert(smallest_value.node);
-        for entry in graph.nodes.get(&smallest_value.node).unwrap().connections.into_iter() {
+        not_visited.remove(&smallest_value.node);
+        visited.insert(smallest_value);
 
+        for entry in graph.nodes.get(&smallest_value.node).unwrap().connections.as_slice() {
+            match not_visited.get_mut(&entry.destination) {
+                None => {}
+                Some(cost) => *cost = entry.cost + smallest_value.cost
+            }
         }
-    }
 
+    }
     return Ok("Temp Entry".to_string());
 }
 
@@ -74,5 +77,5 @@ fn main() {
     graph.new_connection('D', 'A', 4);
     graph.print_graph();
 
-    shortest_path(&graph, 'A', 'B').unwrap();
+    shortest_path(&graph, 'A', 'C').unwrap();
 }

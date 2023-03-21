@@ -11,9 +11,9 @@ pub struct Node {
     pub connections: Box<Vec<Link>>
 }
 
-struct Link {
-    cost: u32,
-    destination: char
+pub struct Link {
+    pub cost: u32,
+    pub destination: char
 }
 
 impl Graph {
