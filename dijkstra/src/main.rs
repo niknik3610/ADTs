@@ -12,12 +12,12 @@ struct ShortestPathEntry {
     cost: u32
 }
 
-fn shortest_path(graph: &Graph, start_node: char, end_node: char) -> Result<String, String> {
-    if !graph.nodes.contains_key(&start_node) || !graph.nodes.contains_key(&end_node) {
-        return Err("Graph doesn't contain these nodes".to_string()); 
-    }
+fn shortest_path(graph: &Graph, start_node: char) -> Result<String, String> {
+    //if !graph.nodes.contains_key(&start_node) || !graph.nodes.contains_key(&end_node) {
+    //    return Err("Graph doesn't contain these nodes".to_string()); 
+    //}
     let mut not_visited = HashMap::new();
-    let mut visited = HashSet::new();
+    let mut visited: HashSet<ShortestPathEntry> = HashSet::new();
     let mut final_path: BTreeSet<char> = BTreeSet::new();
 
     for (key, ..) in &graph.nodes {
@@ -34,6 +34,7 @@ fn shortest_path(graph: &Graph, start_node: char, end_node: char) -> Result<Stri
     }; 
 
     loop {
+        println!("-----------------------------------");
         println!("visited: {visited:?}");
         println!("not visited: {not_visited:?}"); 
 
@@ -53,7 +54,12 @@ fn shortest_path(graph: &Graph, start_node: char, end_node: char) -> Result<Stri
         for entry in graph.nodes.get(&smallest_value.node).unwrap().connections.as_slice() {
             match not_visited.get_mut(&entry.destination) {
                 None => {}
-                Some(cost) => *cost = entry.cost + smallest_value.cost
+                Some(cost) => {
+                    let new_cost = entry.cost + smallest_value.cost;
+                    if *cost > new_cost {
+                        *cost = entry.cost + smallest_value.cost
+                    }
+                }
             }
         }
 
@@ -77,5 +83,5 @@ fn main() {
     graph.new_connection('D', 'A', 4);
     graph.print_graph();
 
-    shortest_path(&graph, 'A', 'C').unwrap();
+    shortest_path(&graph, 'A').unwrap();
 }
