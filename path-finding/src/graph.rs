@@ -12,7 +12,7 @@ pub struct Node {
 }
 
 pub struct Link {
-    pub cost: u32,
+    pub cost: i32,
     pub destination: char
 }
 
@@ -30,7 +30,7 @@ impl Graph {
         self.nodes.insert(name, new_node);
         return true;
     }
-    pub fn new_connection(&mut self, node_one_name: char, node_two_name: char, cost: u32) -> bool { 
+    pub fn new_connection(&mut self, node_one_name: char, node_two_name: char, cost: i32) -> bool { 
         if node_one_name == node_two_name {
             return false;
         }

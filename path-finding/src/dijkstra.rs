@@ -1,13 +1,12 @@
-mod graph;
-use graph::Graph;
 use std::collections::HashMap;
+use crate::graph::Graph;
 
-const INFINITY: u32 = 99999;
+const INFINITY: i32 = 99999;
 
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
-struct ShortestPathEntry {
+pub struct ShortestPathEntry {
     node: char,
-    cost: u32,
+    cost: i32,
     prev_node: char
 }
 
@@ -20,7 +19,7 @@ impl ShortestPathEntry {
     }
 }
 
-fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<HashMap<char, ShortestPathEntry>, String> {
+pub fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<HashMap<char, ShortestPathEntry>, String> {
     let mut not_visited: HashMap<char, ShortestPathEntry> = HashMap::new();
     let mut visited: HashMap<char, ShortestPathEntry> = HashMap::new();
 
@@ -53,6 +52,10 @@ fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<HashMap<cha
         visited.insert(smallest_value.node, smallest_value);
 
         for connection in graph.nodes.get(&smallest_value.node).unwrap().connections.as_slice() {
+            if connection.cost < 0 {
+                return Err("Connection cost smaller than zero".to_string());
+            }
+
             match not_visited.get_mut(&connection.destination) {
                 None => {}
                 Some(node) => {
@@ -68,7 +71,7 @@ fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<HashMap<cha
     return Ok(visited);
 }
 
-fn find_shortest_path(destination_node: char, tree: HashMap<char, ShortestPathEntry>) -> Result<String, String> {
+pub fn find_shortest_path(destination_node: char, tree: HashMap<char, ShortestPathEntry>) -> Result<String, String> {
     if !tree.contains_key(&destination_node) {
         return Err("Destination node doesn't exist".to_string());
     }
@@ -91,41 +94,3 @@ fn find_shortest_path(destination_node: char, tree: HashMap<char, ShortestPathEn
     return Ok(path.chars().rev().collect());
 }
 
-fn main() { 
-    let mut graph = graph::Graph {
-        nodes: HashMap::new()
-    };
-    graph.new_node('A');
-    graph.new_node('B');
-    graph.new_node('C');
-    graph.new_node('D');
-    graph.print_graph();
-
-    graph.new_connection('A', 'B', 5);
-    graph.new_connection('B', 'C', 10);
-    graph.new_connection('C', 'D', 3);
-    graph.new_connection('D', 'A', 4);
-    graph.print_graph();
-
-    let tree = match gen_shortest_path_tree(&graph, 'C') {
-        Ok(r) => r,
-        Err(e) => {
-            println!("{e}");
-            return;
-        }
-    };
-
-    for (_key, node)in &tree {
-        println!("{}", node.to_string());
-    }
-
-    let path = match find_shortest_path('D', tree) {
-        Ok(r) => r,
-        Err(e) => {
-            println!("{e}");
-            return;
-        }
-    };
-
-    println!("Shortest Path: {path}");
-}
