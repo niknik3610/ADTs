@@ -23,9 +23,6 @@ impl ShortestPathEntry {
 }
 
 fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<HashMap<char, ShortestPathEntry>, String> {
-    //if !graph.nodes.contains_key(&start_node) || !graph.nodes.contains_key(&end_node) {
-    //    return Err("Graph doesn't contain these nodes".to_string()); 
-    //}
     let mut not_visited: HashMap<char, ShortestPathEntry> = HashMap::new();
     let mut visited: HashMap<char, ShortestPathEntry> = HashMap::new();
 
@@ -73,9 +70,23 @@ fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<HashMap<cha
     return Ok(visited);
 }
 
-fn find_shortest_path(destination_node: char, tree: HashMap<char, ShortestPathEntry>) -> Result<String, String> {
-     
+fn find_shortest_path(start_node: char, destination_node: char, tree: HashMap<char, ShortestPathEntry>) -> Result<String, String> {
+    let mut path = "".to_string();
+    let mut current_node = match tree.get(&destination_node) {
+        Some(r) => r,
+        None => return Err("Couldn't find destination".to_owned())
+    };
 
+    path += &(&current_node.node.to_string());
+    while current_node.node != start_node {
+        path += &" ,";
+        current_node = match tree.get(&current_node.prev_node) {
+            Some(r) => r,
+            None => return Err("Could not find a node".to_owned())
+        };
+        path += &current_node.node.to_string();
+    }
+    return Ok(path.chars().rev().collect());
 }
 
 fn main() { 
@@ -94,7 +105,7 @@ fn main() {
     graph.new_connection('D', 'A', 4);
     graph.print_graph();
 
-    let tree = match gen_shortest_path_tree(&graph, 'C') {
+    let tree = match gen_shortest_path_tree(&graph, 'A') {
         Ok(r) => r,
         Err(e) => {
             println!("{e}");
@@ -102,7 +113,17 @@ fn main() {
         }
     };
 
-    for (_key, node)in tree {
+    for (_key, node)in &tree {
         println!("{}", node.to_string());
     }
+
+    let path = match find_shortest_path('A', 'C', tree) {
+        Ok(r) => r,
+        Err(e) => {
+            println!("{e}");
+            return;
+        }
+    };
+
+    println!("Shortest Path: {path}");
 }
