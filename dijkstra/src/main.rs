@@ -9,39 +9,45 @@ const INFINITY: u32 = 99999;
 #[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
 struct ShortestPathEntry {
     node: char,
-    cost: u32
+    cost: u32,
+    prev_node: char
 }
 
-fn shortest_path(graph: &Graph, start_node: char) -> Result<String, String> {
+impl ShortestPathEntry {
+    pub fn to_string(&self) -> String {
+        let mut to_return = "Node: ".to_string() + &self.node.to_string();
+        to_return += &(" Cost: ".to_string() + &self.cost.to_string());
+        to_return += &(" Prev Node: ".to_string() + &self.prev_node.to_string());
+        return to_return;
+    }
+}
+
+fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<HashMap<char, ShortestPathEntry>, String> {
     //if !graph.nodes.contains_key(&start_node) || !graph.nodes.contains_key(&end_node) {
     //    return Err("Graph doesn't contain these nodes".to_string()); 
     //}
-    let mut not_visited = HashMap::new();
-    let mut visited: HashSet<ShortestPathEntry> = HashSet::new();
-    let mut final_path: BTreeSet<char> = BTreeSet::new();
+    let mut not_visited: HashMap<char, ShortestPathEntry> = HashMap::new();
+    let mut visited: HashMap<char, ShortestPathEntry> = HashMap::new();
 
     for (key, ..) in &graph.nodes {
         if *key == start_node {
-            not_visited.insert(start_node, 0);
+            not_visited.insert(start_node, ShortestPathEntry{node: start_node, cost: 0, prev_node: start_node});
             continue;
         }
-        not_visited.insert(*key, INFINITY );
+        not_visited.insert(*key, ShortestPathEntry { node: *key, cost: INFINITY, prev_node: '$' });
     }
     
     let temp_path = ShortestPathEntry {
         node: '$',
-        cost: INFINITY + 1
+        cost: INFINITY + 1,
+        prev_node: '$'
     }; 
 
     loop {
-        println!("-----------------------------------");
-        println!("visited: {visited:?}");
-        println!("not visited: {not_visited:?}"); 
-
         let mut smallest_value = temp_path.clone();
-        for (node, cost) in not_visited.iter() {
-            if cost < &smallest_value.cost {
-                smallest_value = ShortestPathEntry {node: *node, cost: *cost};
+        for (_key, node) in not_visited.iter() {
+            if node.cost < smallest_value.cost {
+                smallest_value = node.clone();
             }
         } 
         if smallest_value == temp_path  {
@@ -49,22 +55,27 @@ fn shortest_path(graph: &Graph, start_node: char) -> Result<String, String> {
         }
 
         not_visited.remove(&smallest_value.node);
-        visited.insert(smallest_value);
+        visited.insert(smallest_value.node, smallest_value);
 
-        for entry in graph.nodes.get(&smallest_value.node).unwrap().connections.as_slice() {
-            match not_visited.get_mut(&entry.destination) {
+        for connection in graph.nodes.get(&smallest_value.node).unwrap().connections.as_slice() {
+            match not_visited.get_mut(&connection.destination) {
                 None => {}
-                Some(cost) => {
-                    let new_cost = entry.cost + smallest_value.cost;
-                    if *cost > new_cost {
-                        *cost = entry.cost + smallest_value.cost
+                Some(node) => {
+                    let new_cost = connection.cost + smallest_value.cost;
+                    if node.cost > new_cost {
+                        node.cost = connection.cost + smallest_value.cost;
+                        node.prev_node = smallest_value.node;
                     }
                 }
             }
         }
-
     }
-    return Ok("Temp Entry".to_string());
+    return Ok(visited);
+}
+
+fn find_shortest_path(destination_node: char, tree: HashMap<char, ShortestPathEntry>) -> Result<String, String> {
+     
+
 }
 
 fn main() { 
@@ -83,5 +94,15 @@ fn main() {
     graph.new_connection('D', 'A', 4);
     graph.print_graph();
 
-    shortest_path(&graph, 'A').unwrap();
+    let tree = match gen_shortest_path_tree(&graph, 'C') {
+        Ok(r) => r,
+        Err(e) => {
+            println!("{e}");
+            return;
+        }
+    };
+
+    for (_key, node)in tree {
+        println!("{}", node.to_string());
+    }
 }
