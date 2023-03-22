@@ -107,7 +107,7 @@ fn main() {
     graph.new_connection('D', 'A', 4);
     graph.print_graph();
 
-    let tree = match gen_shortest_path_tree(&graph, 'A') {
+    let tree = match gen_shortest_path_tree(&graph, 'C') {
         Ok(r) => r,
         Err(e) => {
             println!("{e}");
@@ -119,7 +119,7 @@ fn main() {
         println!("{}", node.to_string());
     }
 
-    let path = match find_shortest_path('C', tree) {
+    let path = match find_shortest_path('D', tree) {
         Ok(r) => r,
         Err(e) => {
             println!("{e}");
