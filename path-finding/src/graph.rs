@@ -1,13 +1,12 @@
-#![allow(dead_code)]
-#![allow(unused_variables)]
 use std::collections::HashMap;
 
+//Directed graph
 pub struct Graph {
     pub nodes: HashMap<char, Node>
 }
 
 pub struct Node {
-    name: char,
+    pub name: char,
     pub connections: Box<Vec<Link>>
 }
 
@@ -45,10 +44,6 @@ impl Graph {
             None => return false
         }
 
-        match self.nodes.get_mut(&node_two_name) {
-            Some(node) => node.connections.push(Link{cost, destination: node_one_name}),
-            None => return false
-        } 
         return true;
     }
     pub fn print_graph(&self) {

@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::collections::HashMap;
 use crate::dijkstra::*;
 
@@ -13,15 +15,15 @@ fn test_dijkstra() {
     graph.new_node('B');
     graph.new_node('C');
     graph.new_node('D');
-    graph.print_graph();
+    //graph.print_graph();
 
     graph.new_connection('A', 'B', 5);
     graph.new_connection('B', 'C', 10);
     graph.new_connection('C', 'D', 3);
     graph.new_connection('D', 'A', 4);
-    graph.print_graph();
+    //graph.print_graph();
 
-    let tree = match gen_shortest_path_tree(&graph, 'C') {
+    let tree = match gen_shortest_path_tree(&graph, 'A') {
         Ok(r) => r,
         Err(e) => {
             println!("{e}");
@@ -41,9 +43,32 @@ fn test_dijkstra() {
         }
     };
 
-    println!("Shortest Path: {path}");
+    //println!("Shortest Path: {path}");
+}
+
+fn test_bellman_ford() {
+    let mut graph = graph::Graph {
+        nodes: HashMap::new()
+    };
+    graph.new_node('A');
+    graph.new_node('B');
+    graph.new_node('C');
+    graph.new_node('D');
+    //graph.print_graph();
+
+    graph.new_connection('A', 'B', 5);
+    graph.new_connection('B', 'C', 10);
+    graph.new_connection('C', 'D', 3);
+    graph.new_connection('D', 'A', 4);
+    //graph.print_graph();
+    
+    bellman_ford::gen_shortest_path_tree(graph, 'A');
 }
 
 fn main() {
-    //test_dijkstra();
+    println!("Dijkstra:");
+    test_dijkstra();
+    
+    println!("Bellman Ford:");
+    test_bellman_ford();
 }
