@@ -1,8 +1,6 @@
 mod graph;
 use graph::Graph;
-use std::collections::BTreeSet;
 use std::collections::HashMap;
-use std::collections::HashSet;
 
 const INFINITY: u32 = 99999;
 
@@ -70,7 +68,11 @@ fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<HashMap<cha
     return Ok(visited);
 }
 
-fn find_shortest_path(start_node: char, destination_node: char, tree: HashMap<char, ShortestPathEntry>) -> Result<String, String> {
+fn find_shortest_path(destination_node: char, tree: HashMap<char, ShortestPathEntry>) -> Result<String, String> {
+    if !tree.contains_key(&destination_node) {
+        return Err("Destination node doesn't exist".to_string());
+    }
+
     let mut path = "".to_string();
     let mut current_node = match tree.get(&destination_node) {
         Some(r) => r,
@@ -78,7 +80,7 @@ fn find_shortest_path(start_node: char, destination_node: char, tree: HashMap<ch
     };
 
     path += &(&current_node.node.to_string());
-    while current_node.node != start_node {
+    while current_node.prev_node != current_node.node {
         path += &" ,";
         current_node = match tree.get(&current_node.prev_node) {
             Some(r) => r,
@@ -117,7 +119,7 @@ fn main() {
         println!("{}", node.to_string());
     }
 
-    let path = match find_shortest_path('A', 'C', tree) {
+    let path = match find_shortest_path('C', tree) {
         Ok(r) => r,
         Err(e) => {
             println!("{e}");
