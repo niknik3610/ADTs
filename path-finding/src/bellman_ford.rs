@@ -38,10 +38,13 @@ pub fn gen_shortest_path_tree(graph: Graph, start_node: char) -> Result<String, 
             }
         }
     }
-
+    let mut path = String::new();
     for (node, cost) in distances {
-        println!("Node: {node} Cost: {cost}");
+        path += "Node: ";
+        path.push(node);
+        path += " Cost: ";
+        path += cost.to_string().as_str(); 
+        path += ", ";
     }
-
-    return Ok("temp".to_string()); 
+    return Ok(path[..path.len()-2].to_string());
 }

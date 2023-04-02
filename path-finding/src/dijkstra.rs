@@ -19,9 +19,10 @@ impl ShortestPathEntry {
     }
 }
 
-pub fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<HashMap<char, ShortestPathEntry>, String> {
-    let mut not_visited: HashMap<char, ShortestPathEntry> = HashMap::new();
-    let mut visited: HashMap<char, ShortestPathEntry> = HashMap::new();
+type ShortestPathTree = HashMap<char, ShortestPathEntry>;
+pub fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<ShortestPathTree, String> {
+    let mut not_visited: ShortestPathTree = HashMap::new();
+    let mut visited: ShortestPathTree = HashMap::new();
 
     for (key, ..) in &graph.nodes {
         if *key == start_node {

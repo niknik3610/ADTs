@@ -57,21 +57,20 @@ impl Graph {
             println!();
         }
     }
-}
+    pub fn delete_node(&mut self, node_name: char) -> Result<(), String> {
+        let connections = match self.nodes.get(&node_name) {
+            Some(node) => node.connections
+                .iter()
+                .map(|link| link.destination)
+                .collect::<Vec<char>>(),
+            None => return Err(format!("Node {} does not exist", node_name))
+        }; 
+        
+        match self.nodes.remove(&node_name) {
+            Some(_node) => return Ok(()),
+            None => return Err(format!("Node {} does not exist", node_name))
+        }
 
-fn main() {
-    let mut graph = Graph {
-        nodes: HashMap::new()
-    };
-    graph.new_node('A');
-    graph.new_node('B');
-    graph.new_node('C');
-    graph.new_node('D');
-    graph.print_graph();
 
-    graph.new_connection('A', 'B', 5);
-    graph.new_connection('B', 'C', 10);
-    graph.new_connection('C', 'D', 3);
-    graph.new_connection('D', 'A', 4);
-    graph.print_graph();
+    }
 }
