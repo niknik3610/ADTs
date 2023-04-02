@@ -16,6 +16,11 @@ pub struct Link {
 }
 
 impl Graph {
+    pub fn new() -> Graph {
+        Graph {
+            nodes: HashMap::new()
+        }
+    }
     pub fn new_node(&mut self, name: char) -> bool {
         match self.nodes.get(&name) {
             Some(_node) => return false,
@@ -72,5 +77,28 @@ impl Graph {
         }
 
 
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct ShortestPathEntry {
+    pub cost: i32,
+    pub prev_node: char,
+    pub node: char
+}
+
+impl ShortestPathEntry {
+    pub fn new(cost: i32, prev_node: char, node: char) -> ShortestPathEntry {
+        ShortestPathEntry {
+            cost,
+            prev_node,
+            node
+        }
+    } 
+    pub fn to_string(&self) -> String {
+        let mut to_return = "Node: ".to_string() + &self.node.to_string();
+        to_return += &(" Cost: ".to_string() + &self.cost.to_string());
+        to_return += &(" Prev Node: ".to_string() + &self.prev_node.to_string());
+        return to_return;
     }
 }

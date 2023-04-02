@@ -13,11 +13,7 @@ mod tests {
 
     #[test]
     fn test_dijkstra() { 
-        let mut graph = graph::Graph {
-            nodes: HashMap::new()
-        };
-        graph.new_node('A');
-        graph.new_node('B');
+        let mut graph = graph::Graph::new();                
         graph.new_node('C');
         graph.new_node('D');
         //graph.print_graph();
@@ -28,25 +24,23 @@ mod tests {
         graph.new_connection('D', 'A', 4);
         //graph.print_graph();
 
-        let tree = match gen_shortest_path_tree(&graph, 'A') {
+        let path_tree = match gen_shortest_path_tree(&graph, 'A') {
             Ok(r) => r,
             Err(e) => {
                 panic!("{e}");
             }
-        };
+        }; 
 
-        for (_key, node)in &tree {
-            println!("{}", node.to_string());
-        }
+        println!("{:?}", path_tree);
 
-        let path = match find_shortest_path('D', tree) {
+        let shortest_path = match find_shortest_path('D', path_tree) {
             Ok(r) => r,
             Err(e) => {
                 panic!("{e}");
             }
-        };
-        
+        };    
 
+        assert_eq!("A, B, C, D", shortest_path);
     }
     #[test]
     fn test_bellman_ford() {
@@ -64,15 +58,21 @@ mod tests {
         graph.new_connection('C', 'D', 3);
         graph.new_connection('D', 'A', 4);
         //graph.print_graph();
-        let path = match bellman_ford::gen_shortest_path_tree(graph, 'A') {
+        let path_tree = match bellman_ford::gen_shortest_path_tree(graph, 'A') {
             Ok(r) => r,
             Err(e) => { 
                 panic!("{e}");
             }
         };
+ 
+        let shortest_path = match dijkstra::find_shortest_path('D', path_tree) {
+            Ok(r) => r,
+            Err(e) => {
+                panic!("{e}");
+            }
+        }; 
 
-        let test = String::from("Node: C Cost: 15, Node: D Cost: 18, Node: B Cost: 5, Node: A Cost: 0");
-        assert_eq!(test, path);
+        assert_eq!("A, B, C, D", shortest_path);
     }
 }
 

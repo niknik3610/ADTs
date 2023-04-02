@@ -1,23 +1,8 @@
 use std::collections::HashMap;
+use crate::graph::ShortestPathEntry;
 use crate::graph::Graph;
 
 const INFINITY: i32 = 99999;
-
-#[derive(Hash, Eq, PartialEq, Debug, Clone, Copy)]
-pub struct ShortestPathEntry {
-    node: char,
-    cost: i32,
-    prev_node: char
-}
-
-impl ShortestPathEntry {
-    pub fn to_string(&self) -> String {
-        let mut to_return = "Node: ".to_string() + &self.node.to_string();
-        to_return += &(" Cost: ".to_string() + &self.cost.to_string());
-        to_return += &(" Prev Node: ".to_string() + &self.prev_node.to_string());
-        return to_return;
-    }
-}
 
 type ShortestPathTree = HashMap<char, ShortestPathEntry>;
 pub fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<ShortestPathTree, String> {
@@ -26,26 +11,24 @@ pub fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<Shortes
 
     for (key, ..) in &graph.nodes {
         if *key == start_node {
-            not_visited.insert(start_node, ShortestPathEntry{node: start_node, cost: 0, prev_node: start_node});
+            not_visited.insert(start_node, ShortestPathEntry::new(0, start_node, start_node)); 
             continue;
         }
-        not_visited.insert(*key, ShortestPathEntry { node: *key, cost: INFINITY, prev_node: '$' });
+        not_visited.insert(*key, ShortestPathEntry::new(INFINITY, '$', *key));
     }
     
-    let temp_path = ShortestPathEntry {
-        node: '$',
-        cost: INFINITY + 1,
-        prev_node: '$'
-    }; 
+    let temp_path = ShortestPathEntry::new(INFINITY+1, '$', '$');
 
     loop {
         let mut smallest_value = temp_path.clone();
+        let mut found_a_value = false;
         for (_key, node) in not_visited.iter() {
             if node.cost < smallest_value.cost {
                 smallest_value = node.clone();
+                found_a_value = true;
             }
         } 
-        if smallest_value == temp_path  {
+        if !found_a_value {
             break;
         }
 
@@ -88,7 +71,10 @@ pub fn find_shortest_path(destination_node: char, tree: HashMap<char, ShortestPa
         path += &" ,";
         current_node = match tree.get(&current_node.prev_node) {
             Some(r) => r,
-            None => return Err("Could not find a node".to_owned())
+            None => {
+                let error = "Could not find a node: ".to_owned() + &current_node.prev_node.to_string();
+                return Err(error);
+            }
         };
         path += &current_node.node.to_string();
     }
