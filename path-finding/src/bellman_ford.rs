@@ -1,4 +1,5 @@
 use crate::graph::*;
+use crate::path_finder::ShortestPathEntry;
 use std::collections::HashMap;
 
 const INFINITY: i32 = 99999;
@@ -10,12 +11,12 @@ struct Edge {
 }
 
 type ShortestPathTree = HashMap<char, ShortestPathEntry>;
-pub fn gen_shortest_path_tree(graph: Graph, start_node: char) -> Result<ShortestPathTree, String> { 
+pub fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<ShortestPathTree, String> { 
     let mut shortest_path_tree: ShortestPathTree = HashMap::new(); 
     let mut edges: Vec<Edge> = Vec::new();
 
     //populate distance 
-    for (.., node) in graph.nodes {
+    for (.., node) in graph.nodes.iter() {
         shortest_path_tree.insert(node.name, ShortestPathEntry::new(INFINITY, '$', node.name));
         for edge in node.connections.as_slice() {
             edges.push(Edge{origin: node.name, destination: edge.destination, cost: edge.cost});

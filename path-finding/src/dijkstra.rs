@@ -1,6 +1,6 @@
 use std::collections::HashMap;
-use crate::graph::ShortestPathEntry;
 use crate::graph::Graph;
+use crate::path_finder::ShortestPathEntry;
 
 const INFINITY: i32 = 99999;
 
@@ -54,30 +54,3 @@ pub fn gen_shortest_path_tree(graph: &Graph, start_node: char) -> Result<Shortes
     }
     return Ok(visited);
 }
-
-pub fn find_shortest_path(destination_node: char, tree: HashMap<char, ShortestPathEntry>) -> Result<String, String> {
-    if !tree.contains_key(&destination_node) {
-        return Err("Destination node doesn't exist".to_string());
-    }
-
-    let mut path = "".to_string();
-    let mut current_node = match tree.get(&destination_node) {
-        Some(r) => r,
-        None => return Err("Couldn't find destination".to_owned())
-    };
-
-    path += &(&current_node.node.to_string());
-    while current_node.prev_node != current_node.node {
-        path += &" ,";
-        current_node = match tree.get(&current_node.prev_node) {
-            Some(r) => r,
-            None => {
-                let error = "Could not find a node: ".to_owned() + &current_node.prev_node.to_string();
-                return Err(error);
-            }
-        };
-        path += &current_node.node.to_string();
-    }
-    return Ok(path.chars().rev().collect());
-}
-
