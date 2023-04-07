@@ -1,8 +1,3 @@
-#![allow(dead_code)]
-
-use std::collections::HashMap;
-use crate::dijkstra::*;
-
 mod dijkstra;
 mod graph;
 mod bellman_ford;
